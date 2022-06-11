@@ -71,6 +71,32 @@ function addTemplate(list) {
     list.addProject(tempProject);
 }
 
+const PubSub = (function () {
+    const events = {};
+    const subscribe = function (event, func) {
+        console.log(events[event]);
+        if (!events[event]) {
+            events[event] = []
+        };
+        console.log(events[event]);
+        events[event].push(func);
+    };
+    const unsubscribe = function (event, func) {
+        if (events[event]) {
+            events[event].filter((f) => f !== func);
+        }
+    };
+    const publish = function (event, data) {
+        if (events[event]) {
+            events[event].forEach((func) => func(data));
+        };
+    };
+    const showEvents = () => events;
+    
+    return {subscribe, unsubscribe, publish, showEvents};
+    
+})();
+
 const Interface = (function() {
     const content = document.querySelector('.content');
     const load = function(list) {
@@ -116,7 +142,21 @@ const Interface = (function() {
             content.removeChild(content.lastChild);
         }
     }
-    return {load, clear};
+    const modify = function (module) {
+        function createForm(module) {
+            const form = document.createElement('div');
+            form.classList.add(`${module}-form`);
+            const header = document.createElement('div');
+            header.textContent = `Create ${module}`;
+            const name = document.createElement ()
+        }
+
+
+
+
+
+    }
+    return {load, clear, modify};
 })();
 
 Interface.load(userList);
