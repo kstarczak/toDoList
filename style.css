@@ -13,6 +13,14 @@ body {
     margin: 0;
     padding: 0;
 }
+.content-cover {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.7;
+}
 
 .content {
     width: 100vw;
@@ -53,4 +61,9 @@ body {
     display: flex;
     flex-direction: column;
     background-color: rgb(147, 226, 240);
+}
+.forms div {
+    position: absolute;
+    top: 50px;
+    left: 50px;
 }
