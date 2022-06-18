@@ -46,15 +46,10 @@ const Interface = (function () {
         document.querySelector('.content').append(sideBar, taskList);
 
 
-        //ProjectInterface.load(list);
+
     };
 
-    /* const addProject = function() {
-        open up a form with user info//
-        submitttin form will call Project.create and announce this data as Projectcreadted
-        elsewhere toDoList.addProject will run  => this will announce projectModified => project infterface will be subscribed to this
-    };
-    */ 
+ 
     
     const addProject = function () {
         const contentCover = document.querySelector('.content-cover');
@@ -66,23 +61,35 @@ const Interface = (function () {
 
             const header = document.createElement('div');
             header.textContent = 'Create New Project';
+
             const nameInput = document.createElement('input');
             nameInput.id = 'name';
             nameInput.setAttribute('type', 'text');
+            nameInput.placeholder = 'Enter project name'
+
             const colorInput = document.createElement('input');
             colorInput.id = 'color';
+            colorInput.setAttribute('type', 'text')
+            colorInput.placeholder = 'Choose a color (optional)';
+
+            const buttons = document.createElement('div');
+            buttons.classList.add('buttons');
+
             const cancelButton = document.createElement('a');
             cancelButton.classList.add('button');
             cancelButton.id = 'cancel-button';
             cancelButton.textContent = 'Cancel';
             cancelButton.addEventListener('click', closeForm);
+
             const submitButton = document.createElement('a')
             submitButton.classList.add('button');
             submitButton.id = 'submit-button'
             submitButton.textContent = 'Create';
-            cancelButton.addEventListener('click', submitForm);
+            submitButton.addEventListener('click', submitForm);
 
-            form.append(header, nameInput, colorInput, cancelButton, submitButton);
+            buttons.append(cancelButton, submitButton);
+
+            form.append(header, nameInput, colorInput, buttons);
             forms.append(form);
         };
         function closeForm() {
@@ -90,11 +97,13 @@ const Interface = (function () {
             contentCover.style.display = 'none';
         }
         function submitForm() {
-            const name = nameInput.value;
-            const color = colorInput.value;
-            //fix to not require import of project and task
+            const name = document.querySelector('#name').value;
+            const color = document.querySelector('#color').value;
+            const newProject = Project.create(name, color);
+            // add publish event later to allow cfactory function to do the work
             closeForm();
-            PubSub.publish('addProject', Project.create(name, color));
+            PubSub.publish('addProject', newProject);
+            // broadcast add project with project data
         }
         createForm();
     };
@@ -104,12 +113,13 @@ const Interface = (function () {
 
 
 
-/*
 const ProjectInterface = (function () {
-    const load = function (list) {
-        projectList = document.querySelector('.project-list');
+    const load = function (userlist) {
+        const projectList = document.querySelector('.project-list');
         deleteAllChildren(projectList);
-        const projects = list.projectList();
+        console.log(userlist);
+        const projects = userlist.projectList();
+        console.log(projects)
         projects.forEach(function (project) {
             listItem = document.createElement('li');
             listItem.innerHTML = `<a id="${project.id}" class="project-link">${project.name}</a>`;
@@ -119,14 +129,21 @@ const ProjectInterface = (function () {
         listLinks.forEach.addEventListener('click', deleteProject)
     };
     function deleteProject(e) {
-        PubSub.publish('deleteProject',)
+        listItem = e.target.parentElement;
+        projectList.removeChild(listItem);
+        alert(e.target.id);
+        // publsish delete project with project ID data
+        PubSub.publish('deleteProject', e.target.id);
     }
-    PubSub.subscribe('projectModified', load)
+    
+   
     //// fiure out how to vall the function with the proper list etc
     return { load };
 }
 )();
-*/
+
+PubSub.subscribe('projectAdded', ProjectInterface.load)
+PubSub.subscribe('projectDeleted', ProjectInterface.load)
 
 
 /*
@@ -150,4 +167,4 @@ const TaskInterface = (function () {
 )();
 */
 
-export { Interface};
+export { Interface, ProjectInterface};

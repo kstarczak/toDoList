@@ -8,12 +8,12 @@ export const ToDoList = (function () {
             project.id = id;
             id++;
             list.push(project)
-            PubSub.publish('projectModified', list);
+            PubSub.publish('projectAdded', list);
             //publush taskModified with list data
         };
         const deleteProject = function (projectId) {
             list = list.filter(obj => obj.id !== ProjectId);
-            PubSub.publish('projectModified', list);
+            PubSub.publish('projectDeleted', list);
             //publish taskmodified with list data
         };
         const projectList = () => list;

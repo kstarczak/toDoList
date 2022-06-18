@@ -5,24 +5,27 @@ export const Project = (function () {
         let list = [];
         let id = 1;
         const addTask = function (task) {
+            console.log(task);
+            console.log(id);
             task.id = id;
             id++;
             list.push(task);
-            PubSub.publish('taskModified', list);
-            //pubslish 'taskModified' with list data
+            PubSub.publish(`project${this.id}TaskAdded`, list);
+            //broadcast project#taskAdded with update list data;
         };
         const deleteTask = function (taskId) {
             list = list.filter(obj => obj.id !== taskId);
-            PubSub.publish('taskModified', list);
-            //publish task modified with list data
+            PubSub.publish(`project${this.id}TaskDeleted`, list);
+            //broadcast project#taskDeleted with update list data;
         };
         const taskList = () => list;
+        PubSub.subscribe(`project${this.id}AddTask`, this.addTask);
+        //listen when tasks are added to the project and call this.addTask
+        PubSub.subscribe(`project${this.id}DeleteTask`, this.deleteTask);
         return { name, color, addTask, deleteTask, taskList };
+        //listen when tasks are deleted the project and call this.deleteTask
     };
     return { create };
-    /* subscribe to add and delete task events of 
-     fix assignment of this to notify pubsub of the project name
-    PubSub.subscribe('addTask', this.addTask);
-    PubSub.subscribe('deleteTask', this.deleteTask);
-    */
 })();
+
+PubSub.publish()
