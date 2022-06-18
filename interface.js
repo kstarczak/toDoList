@@ -6,6 +6,7 @@ import { deleteAllChildren } from "./myLibrary.js";
 const Interface = (function () {
 
     const load = function (list) {
+        console.log(list);
         const content = document.querySelector('.content');
         deleteAllChildren(content);
 
@@ -20,30 +21,47 @@ const Interface = (function () {
 
         const projectHeader = document.createElement('div');
         projectHeader.classList.add('project-header');
-        projectHeader.textContent = 'Your Projects:'
+
+        const projectHeaderTitle = document.createElement('div');
+        projectHeaderTitle.classList.add('project-header-title');
+        projectHeaderTitle.textContent = 'Your Projects:';
 
         const addProjectButton = document.createElement('a');
         addProjectButton.classList.add('add-project-button');
         addProjectButton.textContent = 'Add Project'
         addProjectButton.addEventListener('click', addProject);
+        projectHeader.append(projectHeaderTitle, addProjectButton);
 
         const projectList = document.createElement('ul')
         projectList.classList.add('project-list');
         //projectList.addEventListener('click', deleteProject);
 
-        projectContainer.append(projectHeader, addProjectButton, projectList);
+        projectContainer.append(projectHeader, projectList);
 
         sideBar.append(mainHeader, projectContainer);
 
-        const taskList = document.createElement('div');
-        taskList.classList.add('task-list');
+        const taskContainer = document.createElement('div');
+        taskContainer.classList.add('task-container');
 
         const taskHeader = document.createElement('div');
         taskHeader.classList.add('task-header');
-        taskHeader.textContent = 'TEMPORARY LIST HEADER';
-        taskList.appendChild(taskHeader);
 
-        document.querySelector('.content').append(sideBar, taskList);
+        const taskHeaderTitle = document.createElement('div');
+        taskHeaderTitle.classList.add('task-header-title');
+        taskHeaderTitle.textContent = 'Your tasks:';
+
+        const addtaskButton = document.createElement('a');
+        addtaskButton.classList.add('add-task-button');
+        addtaskButton.textContent = 'Add task'
+        //addtaskButton.addEventListener('click', addtask);
+        taskHeader.append(taskHeaderTitle, addtaskButton);
+
+        const taskList = document.createElement('ul');
+        taskList.classList.add('task-list');
+
+        taskContainer.appendChild(taskHeader, taskList);
+
+        document.querySelector('.content').append(sideBar, taskContainer);
 
 
 

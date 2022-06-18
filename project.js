@@ -5,8 +5,6 @@ export const Project = (function () {
         let list = [];
         let id = 1;
         const addTask = function (task) {
-            console.log(task);
-            console.log(id);
             task.id = id;
             id++;
             list.push(task);

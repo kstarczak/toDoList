@@ -14,10 +14,13 @@ function addTemplate(list) {
     templateProject.addTask(Task.create({ name: 'Buy milk' }));
 
     templateProject.addTask(Task.create({ name: 'Pay cable bill' }));
+    
     list.addProject(templateProject);
+
+    console.log(list);
 }
 
 Interface.load(currentUserList);
 addTemplate(currentUserList);
-ProjectInterface.load(currentUserList);
+//ProjectInterface.load(currentUserList);
 
