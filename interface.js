@@ -1,74 +1,86 @@
 import { PubSub } from './pubSub.js';
-import { Task } from './task.js';
-import { Project } from './project.js';
 import { deleteAllChildren } from "./myLibrary.js";
 
 const Interface = (function () {
-
-    const load = function (list) {
-        console.log(list);
+    //selects content div on html file and, deletes any children, then creates interface based on userList
+    const load = function (userList) {
         const content = document.querySelector('.content');
         deleteAllChildren(content);
 
-        const sideBar = document.createElement('div');
-        sideBar.classList.add('side-bar');
-        const mainHeader = document.createElement('div');
+        const mainHeader = document.createElement('nav');
         mainHeader.classList.add('main-header');
-        mainHeader.textContent = `${list.user}'s To Do List`;
+        mainHeader.textContent = `${userList.user}'s To Do List`;
+
+        const projectContent = document.createElement('div');
+        projectContent.classList.add('project-content');
+
+        const taskContent = document.createElement('div');
+        taskContent.classList.add('task-content');
+
+        content.append(mainHeader, projectContent, taskContent);
+
+        // announce to project interface that the main interface is load and submit userdata
+        PubSub.publish('interfaceLoaded', userList);
+    };
+
+    
+    return { load};
+})();
+
+
+
+const ProjectInterface = (function () {
+
+    const load = function (userList) {
+        const projectContent = document.querySelector('.project-content');
 
         const projectContainer = document.createElement('div');
         projectContainer.classList.add('project-container');
 
         const projectHeader = document.createElement('div');
         projectHeader.classList.add('project-header');
+        projectHeader.textContent = 'Your Projects:';
 
-        const projectHeaderTitle = document.createElement('div');
-        projectHeaderTitle.classList.add('project-header-title');
-        projectHeaderTitle.textContent = 'Your Projects:';
+        const projectList = document.createElement('ul')
+        projectList.classList.add('project-list');
 
         const addProjectButton = document.createElement('a');
         addProjectButton.classList.add('add-project-button');
         addProjectButton.textContent = 'Add Project'
-        addProjectButton.addEventListener('click', addProject);
-        projectHeader.append(projectHeaderTitle, addProjectButton);
+        addProjectButton.addEventListener('click', addProject);;
 
-        const projectList = document.createElement('ul')
-        projectList.classList.add('project-list');
-        //projectList.addEventListener('click', deleteProject);
+        projectContainer.append(projectHeader, projectList, addProjectButton);
+        projectContent.append(projectContainer);
 
-        projectContainer.append(projectHeader, projectList);
-
-        sideBar.append(mainHeader, projectContainer);
-
-        const taskContainer = document.createElement('div');
-        taskContainer.classList.add('task-container');
-
-        const taskHeader = document.createElement('div');
-        taskHeader.classList.add('task-header');
-
-        const taskHeaderTitle = document.createElement('div');
-        taskHeaderTitle.classList.add('task-header-title');
-        taskHeaderTitle.textContent = 'Your tasks:';
-
-        const addtaskButton = document.createElement('a');
-        addtaskButton.classList.add('add-task-button');
-        addtaskButton.textContent = 'Add task'
-        //addtaskButton.addEventListener('click', addtask);
-        taskHeader.append(taskHeaderTitle, addtaskButton);
-
-        const taskList = document.createElement('ul');
-        taskList.classList.add('task-list');
-
-        taskContainer.appendChild(taskHeader, taskList);
-
-        document.querySelector('.content').append(sideBar, taskContainer);
-
-
-
+        loadList(userList.projectList());
+        
     };
 
- 
-    
+    const loadList = function (projectList) {
+        const projectDiv = document.querySelector('.project-list');
+        deleteAllChildren(projectList);
+        projectList.forEach(function (project) {
+            listItem = document.createElement('li');
+            listItem.innerHTML = `<a id="${project.id}" class="project-link">${project.name}</a>`;
+            link = document.querySelector(`a#${project.id}`);
+            link.addEventListener('click', deleteProject);
+            projectDiv.appendChild(listItem);
+            
+        });
+    };
+    function deleteProject(e) {
+        projectId = e.target.Id;
+        // publsish delete project with project ID data
+        PubSub.publish('deleteProject', projectId);
+    }
+
+
+    //list for interface loaded then load the project interface
+    PubSub.subscribe('interfaceLoaded', load);
+    //listen for project list modified and loadlist
+    PubSub.subscribe('projectListModified', loadList);
+
+
     const addProject = function () {
         const contentCover = document.querySelector('.content-cover');
         const forms = document.querySelector('.forms');
@@ -103,7 +115,7 @@ const Interface = (function () {
             submitButton.classList.add('button');
             submitButton.id = 'submit-button'
             submitButton.textContent = 'Create';
-            submitButton.addEventListener('click', submitForm);
+            //submitButton.addEventListener('click', submitForm);
 
             buttons.append(cancelButton, submitButton);
 
@@ -114,7 +126,7 @@ const Interface = (function () {
             deleteAllChildren(forms);
             contentCover.style.display = 'none';
         }
-        function submitForm() {
+        /*function submitForm() {
             const name = document.querySelector('#name').value;
             const color = document.querySelector('#color').value;
             const newProject = Project.create(name, color);
@@ -123,45 +135,15 @@ const Interface = (function () {
             PubSub.publish('addProject', newProject);
             // broadcast add project with project data
         }
+        */
         createForm();
     };
-
-    return { load};
-})();
-
-
-
-const ProjectInterface = (function () {
-    const load = function (userlist) {
-        const projectList = document.querySelector('.project-list');
-        deleteAllChildren(projectList);
-        console.log(userlist);
-        const projects = userlist.projectList();
-        console.log(projects)
-        projects.forEach(function (project) {
-            listItem = document.createElement('li');
-            listItem.innerHTML = `<a id="${project.id}" class="project-link">${project.name}</a>`;
-            projectList.appendChild(listItem);
-        });
-        const listLinks = domcument.querySelectorAll('.project-link');
-        listLinks.forEach.addEventListener('click', deleteProject)
-    };
-    function deleteProject(e) {
-        listItem = e.target.parentElement;
-        projectList.removeChild(listItem);
-        alert(e.target.id);
-        // publsish delete project with project ID data
-        PubSub.publish('deleteProject', e.target.id);
-    }
-    
-   
-    //// fiure out how to vall the function with the proper list etc
     return { load };
 }
 )();
 
-PubSub.subscribe('projectAdded', ProjectInterface.load)
-PubSub.subscribe('projectDeleted', ProjectInterface.load)
+//PubSub.subscribe('ProjectIDModified', ProjectInterface.load)
+//PubSub.subscribe('projectDeleted', ProjectInterface.load)
 
 
 /*
@@ -181,8 +163,11 @@ const TaskInterface = (function () {
     PubSub.subscribe('projectsModified', load)
     //// fiure out how to vall the function with the proper list etc
     return { load };
+
+    //PubSub.subscribe('projectModified')
 }
 )();
 */
+
 
 export { Interface, ProjectInterface};

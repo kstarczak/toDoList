@@ -28,34 +28,31 @@ body {
 .content {
     width: 100vw;
     height: 100vh;
-    display: flex;
-    justify-content: space-between;
-}
-.content div {
-    flex: 1;
-}
-.side-bar {
-    background-color: rgb(230, 227, 227);
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template: 4rem 1fr / 1fr 2fr;
+    grid-template-areas: 
+    "header header"
+    "projects tasks";
 }
 .main-header {
+    grid-area: header;
     font-size: 24px;
     font-weight: 700;
     padding: 1rem;
-    border: 1px solid black;
+    background-color: bisque;
+}
+.project-content {
+    background-color: rgb(230, 227, 227);
+    grid-area: projects;
+    display: flex;
+    flex-direction: column;
 }
 .project-header, .task-header {
-    display: flex;
-    align-items: center;
+    font-size: 20px;
+        font-weight: 700;
     padding: 1rem;
     background-color: rgb(226, 222, 222);
     box-shadow: 0px 2px 5px rgb(78, 78, 78);
-}
-
-.project-header-title {
-    font-size: 20px;
-    font-weight: 700;
 }
 .add-project-button {
     color: rgb(92, 2, 2);
@@ -72,14 +69,16 @@ body {
     justify-content: flex-start;
     padding-left: 2rem;
 }
-.project {
+.project-link {
+    display: block;
     transition: 0.2s;
 }
-.project:hover {
+.project-link:hover {
     cursor: pointer;
     background-color: yellow;
 }
-.task-list{
+.task-content{
+    grid-area: tasks;
     display: flex;
     flex-direction: column;
     background-color: rgb(147, 226, 240);

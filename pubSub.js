@@ -18,6 +18,6 @@ export const PubSub = (function () {
     };
     const eventList = () => events;
 
-    return { events, subscribe, unsubscribe, publish, eventList };
+    return  { subscribe, unsubscribe, publish, eventList };
 
 })();

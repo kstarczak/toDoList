@@ -1,7 +1,7 @@
 import { ToDoList } from './toDoList.js';
 import { Project } from './project.js';
 import { Task } from './task.js';
-import { Interface, ProjectInterface } from './interface.js';
+import { Interface } from './interface.js';
 
 
 let currentUser = prompt('Welcome to my "To Do" List. Enter your name to get started.');
@@ -16,11 +16,10 @@ function addTemplate(list) {
     templateProject.addTask(Task.create({ name: 'Pay cable bill' }));
     
     list.addProject(templateProject);
-
-    console.log(list);
+;
 }
+
 
 Interface.load(currentUserList);
 addTemplate(currentUserList);
-//ProjectInterface.load(currentUserList);
 

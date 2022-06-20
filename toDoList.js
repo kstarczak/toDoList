@@ -8,18 +8,17 @@ export const ToDoList = (function () {
             project.id = id;
             id++;
             list.push(project)
-            PubSub.publish('projectAdded', list);
-            //publush taskModified with list data
+            PubSub.publish('ProjectListModified', list);
+            //publushd with list data
         };
         const deleteProject = function (projectId) {
             list = list.filter(obj => obj.id !== ProjectId);
-            PubSub.publish('projectDeleted', list);
-            //publish taskmodified with list data
+            PubSub.publish('ProjectListModified', list);
+            //publish with list data
         };
         const projectList = () => list;
-        PubSub.subscribe('addProject', this.addProject);
-        PubSub.subscribe('deleteProject', this.deleteProject);
         return { user, addProject, deleteProject, projectList };
+        
     };
     return { create };
 
