@@ -1,26 +1,13 @@
-import { ToDoList } from './toDoList.js';
-import { Project } from './project.js';
-import { Task } from './task.js';
 import { Users } from './users.js';
 import { Interface } from './interface.js';
 
 
+
+/*
+on load run the users module which will run:
+let currentUser = prompt('Welcome to my "To Do" List. Enter your name to get started.');
+*/
+
 let currentUser = prompt('Welcome to my "To Do" List. Enter your name to get started.');
 
-const currentUserList = ToDoList.create(currentUser);
-
-function addTemplate(list) {
-    const templateProject = Project.create('My Errands');
-    
-    templateProject.addTask(Task.create({ name: 'Buy milk' }));
-
-    templateProject.addTask(Task.create({ name: 'Pay cable bill' }));
-    
-    list.addProject(templateProject);
-;
-}
-
-
-Interface.load(currentUserList);
-addTemplate(currentUserList);
-
+Users.addUser(currentUser);

@@ -19,12 +19,18 @@ const listObject = {
     }
 };
 
-/* function createForm() {
+/* function createForm(type, ...param) {
     const form = document.createElement('div');
-    form.classList.add('project-form');
+    form.classList.add(`${type}-form`);
 
     const header = document.createElement('div');
-    header.textContent = 'Create New Project';
+    header.textContent = `Create New ${type}`;
+    form.appendChild(header);
+
+    inputs.forEach(function(param) {
+        const inputElement = document.createElement('input');
+        inputElement.id = ``
+    })
     const nameInput = document.createElement('input');
     nameInput.id = 'name';
     nameInput.setAttribute('type', 'text');
