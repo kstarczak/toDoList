@@ -18,14 +18,15 @@ const Interface = (function () {
         taskContent.classList.add('task-content');
 
         content.append(mainHeader, projectContent, taskContent);
-
-        // announce to project interface that the main interface is load and submit userdata
-        PubSub.publish('interfaceLoaded', userList);
+        ProjectInterface.load(userList);
     };
 
     
     return { load};
 })();
+
+
+PubSub.subscribe('currentUserChanged', Interface.load);
 
 
 
@@ -75,8 +76,7 @@ const ProjectInterface = (function () {
     }
 
 
-    //list for interface loaded then load the project interface
-    PubSub.subscribe('interfaceLoaded', load);
+    
     //listen for project list modified and loadlist
     PubSub.subscribe('projectListModified', loadList);
 
@@ -148,7 +148,7 @@ const ProjectInterface = (function () {
 
 /*
 const TaskInterface = (function () {
-    const load = function (project) {
+    const load = function (currentProject) {
         taskList = document.querySelector('task-list');
         deleteAllChildren(taskList);
         tasks = project.taskList();

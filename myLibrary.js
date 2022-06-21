@@ -1,6 +1,21 @@
-export const deleteAllChildren = function (parent) {
+const deleteAllChildren = function (parent) {
     while (parent.firstChild) {
         parent.removeChild(parent.lastChild);
+    }
+};
+
+const listObject = {
+    add: function(item) {
+        item.id = this.id;
+        this.id++;
+        this.list.push(item);
+        const pubList = this.list;
+        PubSub.publish(`${this.type}Modified`, pubList);
+    },
+    delete: function (itemId) {
+        this.list = this.list.filter(obj => obj.id !== itemId);
+        const pubList = this.list;
+        PubSub.publish(`${this.type}Modified`, pubList);
     }
 };
 
@@ -26,3 +41,5 @@ export const deleteAllChildren = function (parent) {
     submitButton.textContent = 'Create';
 };
 */
+
+export { deleteAllChildren, listObject };
