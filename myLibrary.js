@@ -1,3 +1,5 @@
+import { PubSub } from "./pubSub.js";
+
 const deleteAllChildren = function (parent) {
     while (parent.firstChild) {
         parent.removeChild(parent.lastChild);
@@ -5,18 +7,30 @@ const deleteAllChildren = function (parent) {
 };
 
 const listObject = {
-    add: function(item) {
-        item.id = this.id;
-        this.id++;
+    add: function (item) {
+        item.id = this.idCount;
+        this.idCount++;
         this.list.push(item);
-        const pubList = this.list;
-        PubSub.publish(`${this.type}Modified`, pubList);
     },
     delete: function (itemId) {
         this.list = this.list.filter(obj => obj.id !== itemId);
         const pubList = this.list;
         PubSub.publish(`${this.type}Modified`, pubList);
-    }
+    },
+    select: function (itemId) {
+        this.list.forEach(function (item) {
+            if (item.id === itemId) {
+                item.selected = true;
+            } else {
+                item.selected = false;
+            };
+        });
+        const pubList = this.list;
+        const child = pubList.find(item => item.selected);
+        const childList = child.list
+        PubSub.publish(`${this.type}Modified`, pubList);
+        PubSub.publish(`${this.type}Selected`, childList)
+    },
 };
 
 /* function createForm(type, ...param) {

@@ -2,14 +2,13 @@ import { PubSub } from './pubSub.js';
 import { deleteAllChildren } from "./myLibrary.js";
 
 const Interface = (function () {
-    //selects content div on html file and, deletes any children, then creates interface based on userList
-    const load = function (userList) {
+    const load = function (user) {
         const content = document.querySelector('.content');
         deleteAllChildren(content);
 
         const mainHeader = document.createElement('nav');
         mainHeader.classList.add('main-header');
-        mainHeader.textContent = `${userList.user}'s To Do List`;
+        mainHeader.textContent = `${user.name}'s To Do List`;
 
         const projectContent = document.createElement('div');
         projectContent.classList.add('project-content');
@@ -18,23 +17,20 @@ const Interface = (function () {
         taskContent.classList.add('task-content');
 
         content.append(mainHeader, projectContent, taskContent);
-        ProjectInterface.load(userList);
+        ProjectInterface.load();
+        TaskInterface.load();
     };
-
-    
     return { load};
 })();
 
-
-PubSub.subscribe('currentUserChanged', Interface.load);
-
+PubSub.subscribe('userSelected', Interface.load);
 
 
 const ProjectInterface = (function () {
 
-    const load = function (userList) {
+    const load = function () {
         const projectContent = document.querySelector('.project-content');
-
+        deleteAllChildren(projectContent);
         const projectContainer = document.createElement('div');
         projectContainer.classList.add('project-container');
 
@@ -45,7 +41,8 @@ const ProjectInterface = (function () {
         const projectList = document.createElement('ul')
         projectList.classList.add('project-list');
 
-        const addProjectButton = document.createElement('a');
+        const addProjectButton = document.createElement('button');
+        addProjectButton.type = 'button';
         addProjectButton.classList.add('add-project-button');
         addProjectButton.textContent = 'Add Project'
         addProjectButton.addEventListener('click', addProject);;
@@ -53,34 +50,47 @@ const ProjectInterface = (function () {
         projectContainer.append(projectHeader, projectList, addProjectButton);
         projectContent.append(projectContainer);
 
-        loadList(userList.projectList());
-        
+    };
+    const selectProject = function (e) {
+        let projectId = e.target.id;
+        projectId = parseInt(projectId.replace('project', ''));
+        PubSub.publish('selectProject', projectId)
     };
 
-    const loadList = function (projectList) {
-        const projectDiv = document.querySelector('.project-list');
+    const deleteProject = function(e) {
+        let projectId = e.target.previousSibling.id;
+        projectId= parseInt(projectId.replace('project', ''));
+        PubSub.publish('deleteProject', projectId);
+    };
+
+    const loadList = function (list) {
+        const projectList = document.querySelector('.project-list');
         deleteAllChildren(projectList);
-        projectList.forEach(function (project) {
-            listItem = document.createElement('li');
-            listItem.innerHTML = `<a id="${project.id}" class="project-link">${project.name}</a>`;
-            link = document.querySelector(`a#${project.id}`);
-            link.addEventListener('click', deleteProject);
-            projectDiv.appendChild(listItem);
+        list.forEach(function (project) {
+            const projectLink = document.createElement('span');
+            projectLink.textContent = project.name;
+            projectLink.id = project.type + project.id;
+            projectLink.classList.add('project-link');
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.classList.add('delete-project-button');
+            deleteButton.textContent = 'X';
+            const listItem = document.createElement('li');
+            listItem.style.backgroundColor = project.color;
+            listItem.append(projectLink, deleteButton);
+            if (project.selected) {
+                projectLink.classList.add('selected');
+                projectLink.parentElement.classList.add('selected');
+            };
+            projectList.appendChild(listItem);
+            projectLink.addEventListener('click', selectProject);
+            deleteButton.addEventListener('click', deleteProject);
             
         });
     };
-    function deleteProject(e) {
-        projectId = e.target.Id;
-        // publsish delete project with project ID data
-        PubSub.publish('deleteProject', projectId);
-    }
 
 
-    
-    //listen for project list modified and loadlist
-    PubSub.subscribe('projectListModified', loadList);
-
-
+    //move code to forms.JS
     const addProject = function () {
         const contentCover = document.querySelector('.content-cover');
         const forms = document.querySelector('.forms');
@@ -115,7 +125,7 @@ const ProjectInterface = (function () {
             submitButton.classList.add('button');
             submitButton.id = 'submit-button'
             submitButton.textContent = 'Create';
-            //submitButton.addEventListener('click', submitForm);
+            submitButton.addEventListener('click', submitForm);
 
             buttons.append(cancelButton, submitButton);
 
@@ -126,48 +136,183 @@ const ProjectInterface = (function () {
             deleteAllChildren(forms);
             contentCover.style.display = 'none';
         }
-        /*function submitForm() {
+        function submitForm() {
             const name = document.querySelector('#name').value;
             const color = document.querySelector('#color').value;
-            const newProject = Project.create(name, color);
-            // add publish event later to allow cfactory function to do the work
+            const newProject = { name, color };
             closeForm();
             PubSub.publish('addProject', newProject);
-            // broadcast add project with project data
+            
         }
-        */
+        
         createForm();
     };
-    return { load };
+    return { load, loadList };
 }
 )();
 
-//PubSub.subscribe('ProjectIDModified', ProjectInterface.load)
-//PubSub.subscribe('projectDeleted', ProjectInterface.load)
+ //listen for project list modified and loadlist
+PubSub.subscribe('projectListModified', ProjectInterface.loadList);
 
 
-/*
+
+
 const TaskInterface = (function () {
-    const load = function (currentProject) {
-        taskList = document.querySelector('task-list');
+
+    const load = function () {
+        const taskContent = document.querySelector('.task-content');
+        deleteAllChildren(taskContent);
+        const taskContainer = document.createElement('div');
+        taskContainer.classList.add('task-container');
+
+        const taskHeader = document.createElement('div');
+        taskHeader.classList.add('task-header');
+        taskHeader.textContent = '';
+
+        const taskList = document.createElement('ul')
+        taskList.classList.add('task-list');
+
+        const addTaskButton = document.createElement('button');
+        addTaskButton.type = 'button';
+        addTaskButton.classList.add('add-task-button');
+        addTaskButton.textContent = 'Add Task'
+        addTaskButton.addEventListener('click', addTask);
+        addTaskButton.style.display = 'none';
+
+        taskContainer.append(taskHeader, taskList, addTaskButton);
+        taskContent.append(taskContainer);
+    };
+
+    const loadList = function (list) {
+        const addTaskButton = document.querySelector('.add-task-button');
+        if (addTaskButton.style.display === 'none') {
+            addTaskButton.style.display = 'block';
+        };
+        const taskList = document.querySelector('.task-list');
         deleteAllChildren(taskList);
-        tasks = project.taskList();
-        tasks.forEach(function (task) {
-            listItem = document.createElement('li');
-            listItem.id = `${task.id}`;
-            listItem.textContent = task.name;
+        list.forEach(function (task) {
+            const listItem = document.createElement('li');
+            listItem.id = task.type + task.id;
+            listItem.classList.add('task-link');
+            const taskTitle = document.createElement('div');
+            taskTitle.classList.add('task-name');
+            taskTitle.textContent = task.name;
+            const taskDescription = document.createElement('div');
+            taskDescription.classList.add('task-description');
+            taskDescription.textContent = task.description;
+            const deleteButton = document.createElement('button');
+            deleteButton.classList.add('delete-task-button');
+            deleteButton.type = 'button';
+            deleteButton.textContent = 'x';
+            listItem.append(taskTitle, taskDescription, deleteButton);
             taskList.append(listItem);
+            deleteButton.addEventListener('click', deleteTask);
+            
         });
+    };
+    function deleteTask(e) {
+        let taskId = e.target.parentElement.id;
+        taskId = parseInt(taskId.replace('task',''));
+        PubSub.publish('deleteTask', taskId);
+    }
+
+
+    //move code to forms.JS
+    const addTask = function () {
+        const contentCover = document.querySelector('.content-cover');
+        const forms = document.querySelector('.forms');
+        function createForm() {
+            contentCover.style.display = 'block';
+            const form = document.createElement('div');
+            form.classList.add('form');
+
+            const header = document.createElement('div');
+            header.textContent = 'Create New Task';
+
+            const nameInput = document.createElement('input');
+            nameInput.id = 'name';
+            nameInput.setAttribute('type', 'text');
+            nameInput.placeholder = 'Enter Task name'
+
+            const descInput = document.createElement('textarea')
+            descInput.id = 'description';
+            descInput.placeholder = 'Enter a description(optional)';
+
+            const buttons = document.createElement('div');
+            buttons.classList.add('buttons');
+
+            const cancelButton = document.createElement('a');
+            cancelButton.classList.add('button');
+            cancelButton.id = 'cancel-button';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.addEventListener('click', closeForm);
+
+            const submitButton = document.createElement('a')
+            submitButton.classList.add('button');
+            submitButton.id = 'submit-button'
+            submitButton.textContent = 'Create';
+            submitButton.addEventListener('click', submitForm);
+
+            buttons.append(cancelButton, submitButton);
+
+            form.append(header, nameInput, descInput, buttons);
+            forms.append(form);
+        };
+        function closeForm() {
+            deleteAllChildren(forms);
+            contentCover.style.display = 'none';
+        }
+        function submitForm() {
+            const name = document.querySelector('#name').value;
+            const description = document.querySelector('#description').value;
+            const newTask = { name, description };
+            closeForm();
+            PubSub.publish('addTask', newTask);
+            
+        }
+        
+        createForm();
+    };
+    const clear = function (message) {
+        const taskList = document.querySelector('.task-list');
+        deleteAllChildren(taskList);
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        taskList.appendChild(messageDiv);
+        
 
     };
-    PubSub.subscribe('projectsModified', load)
-    //// fiure out how to vall the function with the proper list etc
-    return { load };
 
-    //PubSub.subscribe('projectModified')
+    return { load, loadList, clear };
 }
 )();
-*/
+
+ //listen for task list modified and loadlist
+PubSub.subscribe('projectModified', TaskInterface.loadList);
+PubSub.subscribe('projectListSelected', TaskInterface.loadList);
+PubSub.subscribe('currentProjectDeleted', TaskInterface.clear);
 
 
-export { Interface, ProjectInterface};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export { Interface, ProjectInterface };

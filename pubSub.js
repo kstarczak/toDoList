@@ -1,3 +1,4 @@
+
 export const PubSub = (function () {
     const events = {};
     const subscribe = function (event, func) {
@@ -13,7 +14,8 @@ export const PubSub = (function () {
     };
     const publish = function (event, data) {
         if (events[event]) {
-            events[event].forEach((func) => func(data));
+            events[event].forEach( (func) => func(data) );
+            
         };
     };
     const eventList = () => events;

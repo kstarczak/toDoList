@@ -13,6 +13,14 @@ body {
     margin: 0;
     padding: 0;
 }
+ul, li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+li {
+    display: block;
+}
 .content-cover {
     display: none;
     position: fixed;
@@ -29,16 +37,16 @@ body {
     width: 100vw;
     height: 100vh;
     display: grid;
-    grid-template: 4rem 1fr / 1fr 2fr;
+    grid-template: 6rem 1fr / 1fr 4fr;
     grid-template-areas: 
     "header header"
     "projects tasks";
 }
 .main-header {
     grid-area: header;
-    font-size: 24px;
+    font-size: 32px;
     font-weight: 700;
-    padding: 1rem;
+    padding: 2rem;
     background-color: bisque;
 }
 .project-content {
@@ -54,12 +62,19 @@ body {
     background-color: rgb(226, 222, 222);
     box-shadow: 0px 2px 5px rgb(78, 78, 78);
 }
-.add-project-button {
-    color: rgb(92, 2, 2);
-    transition: 0.2s all;
+.add-project-button, .add-task-button {
+    font-size: 20px;
+    color: rgb(255, 255, 255);
+    border: none;
+    background-color: green;
+    opacity: 0.7;
+    border-radius: 5px;
+    transition: 0.2s;
+    margin-left: 1rem;
 }
-.add-project-button:hover{
-    transform: scale(1.3);
+.add-project-button:hover, .add-task-button:hover{
+    transform: scale(1.1);
+    opacity: 1;
     cursor: pointer;
 }
 
@@ -67,21 +82,64 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding-left: 2rem;
+    padding: 1rem;
+}
+.project-list li {
+    margin-bottom: 0.5rem;
+    background-color: rgb(219, 216, 212);
+    border-radius: 0.5rem;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+
+}
+.project-list li.selected {
+    border: 2px solid black;
+}
+.project-list li:hover {
+    cursor: pointer;
+    background-color: rgb(252, 252, 164);
 }
 .project-link {
-    display: block;
-    transition: 0.2s;
+    font-size: 20px;
+    padding: 1rem;
+    flex: 1;
 }
-.project-link:hover {
-    cursor: pointer;
-    background-color: yellow;
+.delete-project-button, .delete-task-button {
+    background-color: rgb(202, 73, 73);
+    font-size: 18px;
+    color: white;
+    border: none;
+    margin-right: 1rem;
+    border-radius: 5px;
+    opacity: 0.7;
+    transition: 0.2s
+}
+.delete-project-button:hover {
+    transform: scale(1.2);
+    opacity: 1;
 }
 .task-content{
     grid-area: tasks;
     display: flex;
     flex-direction: column;
     background-color: rgb(147, 226, 240);
+}
+.task-link {
+    width: 20rem;
+    background-color: rgb(226, 223, 223);
+    border-radius: 10px;
+    margin: 1rem;
+
+}
+.task-name{
+    font-size: 24px;
+    font-weight: 700;
+
+}
+.task-description {
+    font-size: 20px;
+
 }
 .form {
     margin: 0;
